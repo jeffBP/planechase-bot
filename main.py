@@ -10,7 +10,7 @@ game = pc.Planechase()
 
 @client.event
 async def on_ready():
-    print("We have logged ins as {0.user}".format(client))
+    print("We have logged in as {0.user}".format(client))
 
 
 @client.event
@@ -18,7 +18,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('/startgame'):
+    if message.content.startswith('/start_game'):
         content_str = "Welcome to planechase!"
         await message.channel.send(content_str)
 
@@ -37,18 +37,20 @@ async def on_message(message):
             content_str = "Planeswalk rolled!"
             await message.channel.send(content_str)
     
-    if message.content.startswith('/plane') or message.content.startswith('/startgame') or rpd_outcome == "planeswalk": 
-        pic_file = discord.File(fp=game.get_current_plane_image())
+    if message.content.startswith('/planeswalk'):
+        game.planeswalk()
+    
+    if message.content.startswith('/plane') or message.content.startswith('/start_game') or rpd_outcome == "planeswalk": 
+        pic_file = discord.File(fp=game.get_current_plane_image(), filename='plane.png')
         content_str = "**Current Plane**: {}\n\n".format(game.get_current_plane_name())
-        print(len(pic_file))
-        # await message.channel.send(content_str, file=pic_embed)
+        await message.channel.send(content_str, file=pic_file)
         time.sleep(0.3)
 
-    if message.content.startswith('/static') or message.content.startswith('/startgame') or message.content.startswith('/plane'):
+    if message.content.startswith('/static') or message.content.startswith('/start_game') or message.content.startswith('/plane') or rpd_outcome=="planeswalk":
         content_str = "**Static ability**: {}".format(game.get_current_plane_static_ability())
         await message.channel.send(content_str)
 
-    if message.content.startswith('/chaos') or message.content.startswith('/startgame') or message.content.startswith('/plane') or rpd_outcome == "chaos":
+    if message.content.startswith('/chaos') or message.content.startswith('/start_game') or message.content.startswith('/plane') or rpd_outcome == "chaos" or rpd_outcome == "planeswalk":
         content_str = "**Chaos ability**: {}".format(game.get_current_plane_chaos_ability() if game.get_current_plane_chaos_ability() else "None")
         await message.channel.send(content_str)
     
@@ -59,6 +61,7 @@ async def on_message(message):
         content_str += "**/plane:** Get information about the current plane.\n"
         content_str += "**/static:** Get the current plane's static ability.\n"
         content_str += "**/chaos:** Get the current plane's chaos ability if it has one."
+        content_str += "**/planeswalk:** Force planechase-bot to walk to the next plane."
         await message.channel.send(content_str)
 
 client.run(os.getenv('TOKEN'))

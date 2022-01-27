@@ -29,20 +29,20 @@ class Planechase(object):
         self._num_cards = self._cards_json['total_cards']
         print("Loaded planechase cards!")
         self._current_plane = Plane()
-        self._planeswalk()
+        self.planeswalk()
 
     def roll_planar_die(self):
         choice = random.choices(PLANAR_DIE_OUTCOMES, PLANAR_DIE_WEIGHTS)[0]
         if (choice == "chaos"):
             self._chaos()
         elif (choice == "planeswalk"):
-            self._planeswalk()
+            self.planeswalk()
         return choice
     
-    def _planeswalk(self):
+    def planeswalk(self):
         plane_data = random.choice(self._planes)
         if (self._current_plane.get_name() == plane_data['name']) :
-            self._planeswalk()
+            self.planeswalk()
             return
         self._current_plane = Plane(plane_data['name'], plane_data['oracle_text'], plane_data['image_uris']['small'])
     
@@ -100,11 +100,14 @@ class Plane(object):
         print("Loading image")
         image_response = requests.get(self._image_uri)
         plane_img = Image.open(BytesIO(image_response.content))
-        plane_img.rotate(-90)
-        self._image = plane_img.tobytes()
+        plane_img = plane_img.rotate(-90, expand=True)
+        self._image = BytesIO()
+        plane_img.save(self._image, 'PNG')
+        self._image.seek(0)
         time.sleep(0.3)
 
     def get_plane_image(self):
         if (not self._image):
             self._load_plane_image()
+        self._image.seek(0)
         return self._image
