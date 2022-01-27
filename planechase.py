@@ -44,7 +44,7 @@ class Planechase(object):
         if (self._current_plane.get_name() == plane_data['name']) :
             self.planeswalk()
             return
-        self._current_plane = Plane(plane_data['name'], plane_data['oracle_text'], plane_data['image_uris']['small'])
+        self._current_plane = Plane(plane_data['name'], plane_data['oracle_text'], plane_data['image_uris']['art_crop'])
     
     def _chaos(self):
         print(self._current_plane.get_chaos_ability())
@@ -100,7 +100,6 @@ class Plane(object):
         print("Loading image")
         image_response = requests.get(self._image_uri)
         plane_img = Image.open(BytesIO(image_response.content))
-        plane_img = plane_img.rotate(-90, expand=True)
         self._image = BytesIO()
         plane_img.save(self._image, 'PNG')
         self._image.seek(0)
