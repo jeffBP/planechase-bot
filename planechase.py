@@ -44,13 +44,16 @@ class Planechase(object):
         if (self._current_plane.get_name() == plane_data['name']) :
             self.planeswalk()
             return
-        self._current_plane = Plane(plane_data['name'], plane_data['oracle_text'], plane_data['image_uris']['art_crop'])
+        self._current_plane = Plane(plane_data['name'], plane_data['type_line'], plane_data['oracle_text'], plane_data['image_uris']['art_crop'])
     
     def _chaos(self):
         print(self._current_plane.get_chaos_ability())
      
     def get_current_plane_name(self):
         return self._current_plane.get_name()
+
+    def get_current_plane_type_line(self):
+        return self._current_plane.get_type_line()
 
     def get_current_plane_ability(self):
         return self._current_plane.get_ability()
@@ -66,8 +69,9 @@ class Planechase(object):
 
 
 class Plane(object):
-    def __init__(self, name="", ability="", image_uri=""):
+    def __init__(self, name="", type_line="", ability="", image_uri=""):
         self._name = name
+        self._type_line = type_line
         self._ability = ability
         self._image_uri = image_uri
         self._static_ability = ""
@@ -86,6 +90,9 @@ class Plane(object):
 
     def get_name(self):
         return self._name
+
+    def get_type_line(self):
+        return self._type_line
 
     def get_ability(self):
         return self._ability
