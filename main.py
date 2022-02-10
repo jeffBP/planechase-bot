@@ -8,6 +8,8 @@ client = discord.Client()
 
 game = pc.Planechase()
 
+game_dict = {}
+
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
@@ -15,6 +17,12 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    # Get game for message server
+    server_id = message.guild.id
+    if server_id not in game_dict.keys():
+        game_dict[server_id] = pc.Planechase()
+    game = game_dict[server_id]
+
     if message.author == client.user:
         return
 
