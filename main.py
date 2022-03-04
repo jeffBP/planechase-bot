@@ -6,8 +6,6 @@ import planechase as pc
 
 client = discord.Client()
 
-game = pc.Planechase()
-
 game_dict = {}
 
 @client.event
@@ -62,14 +60,47 @@ async def on_message(message):
     if message.content.startswith('/chaos') or message.content.startswith('/start_game') or message.content.startswith('/plane') or rpd_outcome == "chaos" or rpd_outcome == "planeswalk":
         content_str = "**Chaos ability**: {}".format(game.get_current_plane_chaos_ability() if game.get_current_plane_chaos_ability() else "None")
         await message.channel.send(content_str)
+
+    if message.content.startswith('/denylist_plane'):
+        content_str = ""
+        success = game.denylist_current_plane()
+        if success:
+            content_str = "Added plane ({}) to deny list!".format(game.get_current_plane_name())
+        else:
+            content_str = "Could not add plane ({}) to deny list. It may already be on it.".format(game.get_current_plane_name())
+        await message.channel.send(content_str)
+
+    if message.content.startswith('/show_denylist'):
+        content_str = "**Planechase denylist**: "
+        if game.get_denylist():
+            for plane in game.get_denylist():
+                content_str += plane + ", "
+            content_str = content_str[:len(content_str)-2]
+        await message.channel.send(content_str)
     
+    if message.content.startswith('/remove_from_denylist'):
+        content_str = ""
+        planes_list = message.content.split(' [')[1] # Get plane list.
+        planes_list = planes_list[:len(planes_list)-1] # Remove trailing close bracket.
+        plane_names = planes_list.split(', ') # Split plane list along delimiter.
+        for plane_name in plane_names:
+            success = game.remove_plane_from_denylist(plane_name)
+            if success:
+                content_str += "Successfully removed plane ({}) from denylist!\n".format(plane_name)
+            else:
+                content_str += "Could not remove plane ({}) from denylist. Maybe check your spelling?\n".format(plane_name)
+        await message.channel.send(content_str)
+            
     if message.content.startswith('/help'):
         content_str = "**Bot commands:**\n"
         content_str += "**/start_game:** Start a new game and walks to a random plane.\n"
         content_str += "**/roll** or **/rpd:** Roll the planar die.\n"
         content_str += "**/plane:** Get information about the current plane.\n"
         content_str += "**/static:** Get the current plane's static ability.\n"
-        content_str += "**/planeswalk:** Force planechase-bot to walk to the next plane."
+        content_str += "**/planeswalk:** Force planechase-bot to walk to the next plane.\n"
+        content_str += "**/denylist_plane**: Add current plane to denylist.\n"
+        content_str += "**/show_denylist**: Print current denylist to chat.\n"
+        content_str += "**/remove_from_denylist [<plane_name>, ...]**: Remove planes in list *[<plane_name>, ...]* from denylist."
         await message.channel.send(content_str)
 
 client.run(os.getenv('TOKEN'))
