@@ -29,6 +29,7 @@ class Planechase(object):
         self._num_cards = self._cards_json['total_cards']
         print("Loaded planechase cards!")
         self._current_plane = Plane()
+        self._denylist = []
         self.planeswalk()
 
     def roll_planar_die(self):
@@ -41,7 +42,7 @@ class Planechase(object):
     
     def planeswalk(self):
         plane_data = random.choice(self._planes)
-        if (self._current_plane.get_name() == plane_data['name']) :
+        if (self._current_plane.get_name() == plane_data['name'] or plane_data['name']  in self._denylist) :
             self.planeswalk()
             return
         self._current_plane = Plane(plane_data['name'], plane_data['type_line'], plane_data['oracle_text'], plane_data['image_uris']['art_crop'])
@@ -67,6 +68,23 @@ class Planechase(object):
     def get_current_plane_image(self):
         return self._current_plane.get_plane_image()
 
+    def denylist_current_plane(self):
+        if self._current_plane.get_name() not in self._denylist:
+            self._denylist.append(self._current_plane.get_name())
+            return True
+        else: 
+            return False
+
+    def remove_plane_from_denylist(self, plane_name=""):
+        try:
+            self._denylist.remove(plane_name)
+            return True
+        except ValueError:
+            print ("Plane {} not in denylist!".format(plane_name))
+            return False
+    
+    def get_denylist(self):
+        return self._denylist
 
 class Plane(object):
     def __init__(self, name="", type_line="", ability="", image_uri=""):
